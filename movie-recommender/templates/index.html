@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Recommendation</title>
+</head>
+<body>
+    <h1>Welcome to Movie Recommendation System</h1>
+
+    <form method="POST" action="/">
+        <label for="option">Choose Recommendation Option:</label>
+        <select name="option" id="option">
+            <option value="genre" selected>By Movie Genre</option>
+            <option value="user_preference">By User Preference</option>
+            <option value="viewing_history">By Viewing History</option>
+            <option value="hybrid">Hybrid Recommendation</option>
+            <option value="mood">By Mood</option>
+        </select>
+        <br><br>
+
+        <!-- Genre Option -->
+        <div id="genre_option">
+            <label for="genre">Enter Movie Genre:</label>
+            <input type="text" name="genre" id="genre" required>
+        </div>
+
+        <!-- User-Based Options -->
+        <div id="user_option" style="display: none;">
+            <label for="user_id">Enter User ID:</label>
+            <input type="number" name="user_id" id="user_id">
+        </div>
+
+        <!-- Mood Option -->
+        <div id="mood_option" style="display: none;">
+            <label for="mood">Select Your Mood:</label>
+            <select name="mood" id="mood">
+                <option value="happy">Happy</option>
+                <option value="sad">Sad</option>
+                <option value="tense">Tense</option>
+                <option value="relaxed">Relaxed</option>
+            </select>
+        </div>
+
+        <!-- Number of Recommendations -->
+        <div id="num_recommendations_option">
+            <label for="num_recommendations">Number of Recommendations:</label>
+            <input type="number" name="num_recommendations" id="num_recommendations" required>
+        </div>
+
+        <br><br>
+        <input type="submit" value="Get Recommendations">
+    </form>
+
+    <h2>Recommendations:</h2>
+    <ul>
+        {% for movie in recommendations %}
+            <li>{{ movie.title }} ({{ movie.genres }}) - Rating: {{ movie.rating }}</li>
+        {% endfor %}
+    </ul>
+
+    <script>
+        // 动态显示和隐藏表单字段
+        const optionSelect = document.getElementById('option');
+        const genreOption = document.getElementById('genre_option');
+        const userOption = document.getElementById('user_option');
+        const moodOption = document.getElementById('mood_option');
+        const numRecommendationsOption = document.getElementById('num_recommendations_option');
+
+        const genreInput = document.getElementById('genre');
+        const userInputs = document.querySelectorAll('#user_id');
+        const moodInput = document.getElementById('mood');
+        const numRecommendationsInput = document.getElementById('num_recommendations');
+
+        function updateFormFields() {
+            // 隐藏所有字段
+            genreOption.style.display = 'none';
+            userOption.style.display = 'none';
+            moodOption.style.display = 'none';
+            numRecommendationsOption.style.display = 'none';
+
+            genreInput.required = false;
+            userInputs.forEach(input => input.required = false);
+            moodInput.required = false;
+            numRecommendationsInput.required = false;
+
+            // 根据选项显示对应字段，并设置 required 属性
+            const selectedOption = optionSelect.value;
+            if (selectedOption === 'genre') {
+                genreOption.style.display = 'block';
+                numRecommendationsOption.style.display = 'block';
+                genreInput.required = true;
+                numRecommendationsInput.required = true;
+            } else if (selectedOption === 'user_preference' || selectedOption === 'viewing_history' || selectedOption === 'hybrid') {
+                userOption.style.display = 'block';
+                numRecommendationsOption.style.display = 'block';
+                userInputs.forEach(input => input.required = true);
+                numRecommendationsInput.required = true;
+            } else if (selectedOption === 'mood') {
+                moodOption.style.display = 'block';
+                numRecommendationsOption.style.display = 'block';
+                moodInput.required = true;
+                numRecommendationsInput.required = true;
+            }
+        }
+
+        // 初次加载时调用
+        updateFormFields();
+
+        // 当选项发生变化时更新
+        optionSelect.addEventListener('change', updateFormFields);
+    </script>
+</body>
+</html>
